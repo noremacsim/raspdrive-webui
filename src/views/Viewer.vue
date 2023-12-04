@@ -4,6 +4,5 @@
   </v-container>
 </template>
 <script setup>
-import {last} from 'lodash';
 import Stats from "@/components/Stats.vue";
 </script>
