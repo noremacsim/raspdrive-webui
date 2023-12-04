@@ -1,0 +1,57 @@
+.small_input {
+  .v-field__overlay {
+    height: 36px;
+  }
+
+  .v-field__input {
+    height: 36px;
+  }
+
+  .v-field  {
+    height: 36px;
+  }
+
+  .v-field__field {
+    height: 36px;
+  }
+
+  .v-field__prepend-inner {
+    height: 36px
+  }
+}
+
+.table_input {
+    width: 100%;
+    outline: none;
+}
+
+table {
+  .selected {
+    border: 2px solid black !important;
+  }
+
+  .editable {
+    cursor: text;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--lightestgrey);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #a7d037;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #82a329;
+}
