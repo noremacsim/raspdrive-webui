@@ -8,3 +8,4 @@
 import Stats from "@/components/Stats.vue";
 import Files from "@/components/FileBrowser.vue";
 </script>
+

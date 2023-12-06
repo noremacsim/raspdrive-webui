@@ -16,8 +16,22 @@ export async function reboot() {
     }
 }
 
+export async function scanWifi() {
+  const content = await callCgi('/cgi-bin/scan_wifi.sh', 'get wifi networks');
+  const result = JSON.parse(content);
+  return result
+}
+
 export async function toggleDrives() {
     await callCgi('/cgi-bin/toggledrives.sh', 'toggledrives');
+}
+
+export async function getWifiStats() {
+  const res = await callCgi('/cgi-bin/status.sh', 'getPiStatus');
+  const result = JSON.parse(res);
+  return {
+    wifi_ssd: result.wifi_ssid,
+  };
 }
 
 export async function getPiStatus() {
