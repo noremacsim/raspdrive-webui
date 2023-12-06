@@ -1,137 +1,90 @@
 import {fromPairs, mapValues, last, intersection} from 'lodash';
-import dayjs from 'dayjs';
-import {positions} from '@/common/positions';
 import { callCgi } from './helper';
 
-export async function getVideoList() {
-    //const content = await callCgi('/cgi-bin/videolist.sh', 'get video list');
-    let content = `
-    RecentClips/201931~6.M/201931~6.MP4
-RecentClips/2023-11-29/2023-11-29_14-26-42-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-26-42-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-26-42-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-26-42-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-27-10-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-27-10-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-27-10-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-27-10-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-30-50-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-30-50-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-30-50-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-30-50-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-31-50-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-31-50-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-31-50-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-31-50-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-15-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-15-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-15-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-15-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-51-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-51-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-51-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-34-51-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-35-51-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-35-51-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-35-51-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-35-51-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-36-51-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-36-51-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-36-51-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-36-51-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-37-51-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-37-51-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-37-51-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-37-51-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-38-51-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-38-51-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-38-51-left_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-38-51-right_repeater.mp4
-RecentClips/2023-11-29/2023-11-29_14-39-51-back.mp4
-RecentClips/2023-11-29/2023-11-29_14-39-51-front.mp4
-RecentClips/2023-11-29/2023-11-29_14-39-51-left_repeater.mp4
-RecentClips/20F0C4~4.M/20F0C4~4.MP4
-RecentClips/thumb.png/thumb.png
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-26-42-back.mp4
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-26-42-front.mp4
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-26-42-left_repeater.mp4
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-26-42-right_repeater.mp4
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-27-10-back.mp4
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-27-10-front.mp4
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-27-10-left_repeater.mp4
-SavedClips/2023-11-29_14-27-14/2023-11-29_14-27-10-right_repeater.mp4
-SavedClips/2023-11-29_14-27-14/event.json
-SavedClips/2023-11-29_14-27-14/thumb.png
-    `;
-    if (content == "") {
-      return null;
+
+export async function getDirectoryListing(folderPath = '/') {
+  const content = await callCgi(`/cgi-bin/filelist.sh?folder=${folderPath}`, 'get file listings');
+
+  const output = [];
+
+  const lines = content.split('\n');
+
+  lines.forEach(line => {
+    const type = line.charAt(0);
+    const name = line.slice(2);
+
+    if (type === 'd') {
+      output.push({ type: 'folder', name, icon: 'mdi-folder'});
+    } else if (type === 'f') {
+      output.push({ type: 'file', name, icon: ' mdi-file'});
     }
-    const paths = content.split('\n').filter(line => line.trim());
-    const groups = paths.reduce(function (result, path) {
-        const [group, sequenceName, filename] = path.split('/');
-        if (filename.includes('~') || sequenceName.includes('json') || sequenceName.includes('thumb')) {
-            return result;
-        }
+  });
 
-        if (!result[group]) {
-            result[group] = {};
-        }
-        if (!result[group][sequenceName]) {
-            result[group][sequenceName] = { clips: {} };
-        }
+  return output
+}
 
-        const sequence = result[group][sequenceName];
-        if (filename.includes('.mp4')) {
-            const {key, date, pos} = parseMp4Filename(filename);
-            if (!sequence.clips[key]) {
-                sequence.clips[key] = {key, date};
-            }
-            sequence.clips[key][pos] = filename;
-        }
-        else if (filename.includes('thumb')) {
-            sequence.thumb = filename;
-        }
-        else if (filename.includes('json')) {
-            sequence.jsonfile = filename;
-        }
+export async function getFileList() {
+  await getDirectoryListing();
+  const content = `
+    folder1
+    folder1/LondonJenny_220922_135153.sql
+    folder1/hi.text
+    folder1/sub1/bye.text
+    hi.text
+    bye.text`;
 
-        return result;
-    }, {});
+  if (content === "") {
+    return null;
+  }
 
-    for (const [, sequences] of Object.entries(groups)) {
-        for (const [, sequence] of Object.entries(sequences)) {
-            sequence.clips = Object.values(sequence.clips).sort((a, b) => a.date - b.date);
-            sequence.clips = sequence.clips.filter(clip => intersection(Object.keys(clip), positions).length === 4);
-        }
-    }
+  const folderStructure = {
+    id: 0, // You can set an appropriate root ID
+    name: "Root",
+    children: []
+  };
 
-    // normalize levels into group/date/time
-    return mapValues(groups, function (sequences, groupName) {
-        if (groupName === 'RecentClips') {
-            // RecentClips/2021-12-03/2021-12-03_08-10-41-left_repeater.mp4
-            return mapValues(sequences, function ({clips}, dirName) {
-                const dates = groupDates(clips.map(clip => clip.date));
-                return dates.reduce(function (ret, date, index) {
-                    const key = dayjs(date).format('HH:mm:ss');
-                    const i = clips.findIndex(clip => clip.date === date);
-                    const j = dates[index + 1] ? clips.findIndex(clip => clip.date === dates[index + 1]) : clips.length;
-                    ret[key] = {clips: clips.slice(i, j), date, group: groupName, sequence: dirName};
-                    return ret;
-                }, {});
-            });
-        }
+  function transformFolderStructure(originalStructure, parentItem) {
+    originalStructure.forEach(folder => {
+      const currentItem = { id: folder.id, name: folder.name, children: [] };
 
-        // SavedClips/2021-12-24_20-38-38/2021-12-24_20-36-14-left_repeater.mp4
-        return Object.entries(sequences).reduce(function (ret, [sequenceName, sequence]) {
-            const {date} = parseDirname(sequenceName);
-            const key = dayjs(date).format('YYYY-MM-DD');
-            if (!ret[key]) {
-                ret[key] = {};
-            }
-            ret[key][dayjs(date).format('HH:mm:ss')] = {...sequence, date, group: groupName, sequence: sequenceName};
-            return ret;
-        }, {});
+      if (folder.content.length > 0) {
+        transformFolderStructure(folder.content, currentItem);
+      } else {
+        const fileExtension = folder.name.split('.').pop().toLowerCase();
+        currentItem.children = [{ id: folder.id + 1, name: folder.name, file: fileExtension }];
+      }
+
+      parentItem.children.push(currentItem);
     });
+  }
+
+  const paths = content.split('\n').filter(line => line.trim());
+  const pathsFolderStructure = [];
+
+  paths.forEach(path => {
+    const files = path.split('/');
+    let currentLevel = pathsFolderStructure;
+
+    for (let i = 0; i < files.length - 1; i++) {
+      const currentFile = files[i];
+
+      let folder = currentLevel.find(item => item.name === currentFile);
+
+      if (!folder) {
+        folder = { id: pathsFolderStructure.length + 1, name: currentFile, content: [] };
+        currentLevel.push(folder);
+      }
+
+      currentLevel = folder.content;
+    }
+
+    const lastFile = files[files.length - 1];
+    currentLevel.push({ id: pathsFolderStructure.length + 1, name: lastFile, content: [] });
+  });
+
+  transformFolderStructure(pathsFolderStructure, folderStructure);
+
+  return JSON.parse(JSON.stringify(folderStructure));
 }
 
 function groupDates(dates) {

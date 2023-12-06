@@ -7,8 +7,8 @@ export function delay(ms) {
 }
 
 export async function callCgi(url, action) {
-    const response = await fetch(`http://192.168.1.208${url}`, {method: 'GET'});
-    if (response.status != 200) {
+    const response = await fetch(`${url}`, {method: 'GET'});
+    if (response.status !== 200) {
         throw new Error(`fail to ${action}`);
     }
     return response.text();

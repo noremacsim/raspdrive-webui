@@ -5,7 +5,7 @@ import {createRouter, createWebHistory} from "vue-router";
 const routes = [
 	// Default layout with Home and Settings components
 	{
-		path: "/",
+		path: "/app",
 		component: () => import("@/layouts/default/Default.vue"),
 		children: [
 			{
@@ -16,4 +16,9 @@ const routes = [
 		],
 	},
 ];
+
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes,
+});
 export default router;

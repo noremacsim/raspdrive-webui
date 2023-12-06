@@ -24,7 +24,11 @@
             color="primary"
             height="25"
             class="rounded-lg"
-          ></v-progress-linear>
+          >
+            <template v-slot:default="{ value }">
+              <strong>{{ stats.used_gb }}GB / {{ stats.total_gb }}GB</strong>
+            </template>
+          </v-progress-linear>
         </v-col>
       </v-row>
     </v-card-text>
@@ -47,7 +51,6 @@
 import {onMounted, ref} from "vue";
 import {getPiStatus} from "@/common/api/device";
 let stats = ref({});
-
 
 onMounted(() => {
   setInterval(() => {

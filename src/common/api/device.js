@@ -4,6 +4,10 @@ export function triggerArchiveSync() {
     return callCgi('/cgi-bin/trigger_sync.sh', 'trigger sync');
 }
 
+export async function updateWifi(ssid, password) {
+  await callCgi(`/cgi-bin/update_wifi.sh?ssid=${ssid}&password=${password}`, 'Update Wifi Settings');
+}
+
 export async function reboot() {
     await callCgi('/cgi-bin/reboot.sh', 'reboot');
     await delay(5000);
@@ -23,6 +27,8 @@ export async function getPiStatus() {
         freeSize: parseInt(result.free_space, 10),
         totalSize: parseInt(result.free_space, 10),
         sizePercent: (((parseInt(result.total_space, 10) - parseInt(result.free_space, 10)) / parseInt(result.total_space, 10)) * 100),
+        total_gb: Math.round(parseInt(result.total_space) / (1024 ** 3)),
+        used_gb: Math.round(parseInt(result.used_space) / (1024 ** 3)),
         cpuTemp: (parseInt(result.cpu_temp, 10) / 1000).toFixed(1) + " C",
         drivesActive: result.drives_active,
         uptime: uptime(parseInt(result.uptime, 10))
