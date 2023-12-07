@@ -24,6 +24,13 @@
         :value="item"
         color="primary"
       >
+
+        <template v-slot:prepend>
+          <v-icon v-if="item.type === 'New'" color="green">mdi-file-document-plus</v-icon>
+          <v-icon v-if="item.type === 'Changed'" color="orange">mdi-file-sync</v-icon>
+          <v-icon v-if="item.type === 'Deleted'" color="red">mdi-file-document-remove</v-icon>
+        </template>
+
         <template v-slot:subtitle="{ log }">
           <div v-html="item.log"></div>
         </template>

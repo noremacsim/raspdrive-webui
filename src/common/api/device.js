@@ -6,12 +6,14 @@ export function triggerArchiveSync() {
 
 export async function getUSBEvents() {
   const content = await callCgi(`/cgi-bin/usb_events.sh`, 'get usb events');
+
   const output = [];
 
   const lines = content.split('\n');
 
   lines.forEach(line => {
-    output.push({ log: line });
+    let item = line.split(':');
+    output.push({ log: item[1], type: item[0] });
   });
 
   return output
