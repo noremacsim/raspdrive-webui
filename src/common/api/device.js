@@ -4,6 +4,19 @@ export function triggerArchiveSync() {
     return callCgi('/cgi-bin/trigger_sync.sh', 'trigger sync');
 }
 
+export async function getUSBEvents() {
+  const content = await callCgi(`/cgi-bin/usb_events.sh`, 'get usb events');
+  const output = [];
+
+  const lines = content.split('\n');
+
+  lines.forEach(line => {
+    output.push({ log: line });
+  });
+
+  return output
+}
+
 export async function updateWifi(ssid, password) {
   await callCgi(`/cgi-bin/update_wifi.sh?ssid=${ssid}&password=${password}`, 'Update Wifi Settings');
 }
